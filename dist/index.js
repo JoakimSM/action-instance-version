@@ -6724,13 +6724,9 @@ const main = async () => {
     try {
         const params = {
             headers: {
-                Authorization:
-                    'Basic ' +
-                    btoa(
-                        core.getInput('username') +
-                            ':' +
-                            core.getInput('password')
-                    ),
+                Authorization: `Basic ${Buffer.from(
+                    `${core.getInput('username')}:${core.getInput('password')}`
+                ).toString('base64')}`,
             },
         }
 
@@ -6742,10 +6738,9 @@ const main = async () => {
             .join('/')
 
         const response = await fetch(url, params)
-        const detailedVersion = (await response.json()).version
-        const minorVersion = Number(/[.](\d+)/.exec(detailedVersion)[1])
-        core.info('output-version: ' + minorVersion)
-        core.setOutput('version', minorVersion)
+        const version = (await response.json()).version
+        core.info(`output-version: ${version}`)
+        core.setOutput('version', version)
     } catch (error) {
         core.setFailed(error.message)
     }
